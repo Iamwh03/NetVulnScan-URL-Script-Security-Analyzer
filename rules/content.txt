@@ -1,0 +1,178 @@
+# --- Offensive C# Tooling & In-Memory Execution ---
+# Attackers are moving from PowerShell to C# to evade detection.
+ExecuteAssembly
+SharpSploit
+Seatbelt
+Rubeus
+GhostPack
+D/Invoke
+Assembly.Load
+
+# --- EDR & AV Evasion Techniques ---
+# Keywords related to unhooking security products or blinding them.
+unhook
+syscall
+ETW patch
+AMSI.ForceFail
+HardwareBreakpoint
+direct syscall
+Patch-ETW
+
+# --- NTLM Relaying & Authentication Coercion ---
+# Very common methods for privilege escalation and lateral movement.
+ntlmrelayx
+impacket
+PetitPotam
+Coerce-Authentication
+Responder.py
+mitm6
+krbrelayx
+
+# --- Newer or Under-the-Radar LOLbins ---
+# Binaries that are increasingly abused but less common on older lists.
+wsl.exe
+winget.exe
+cmstplua.exe
+clipup.exe
+ms-settings
+Desktopimgdownldr.exe
+tar.exe
+
+# --- Cloud Attack Vectors (Azure/Entra ID & AWS) ---
+# As infrastructure moves to the cloud, attackers follow.
+roadrecon
+AADInternals
+MicroBurst
+Get-AzAccessToken
+AZURE_PR_TOKEN
+sts:AssumeRole
+~/.aws/credentials
+pacu
+
+# --- Ransomware Precursors & Data Destruction ---
+# Commands commonly run before ransomware deployment to prevent recovery.
+vssadmin delete shadows
+wbadmin delete catalog
+bcdedit /set {default} bootstatuspolicy ignoreallfailures
+bcdedit /set {default} recoveryenabled no
+wevtutil.exe cl
+wevtutil.exe clear-log
+
+# --- Common Remote Access & C2 Tools ---
+# Popular tools used for persistent access by attackers.
+anydesk
+splashtop
+screenconnect
+ngrok
+Cobalt Strike
+beacon.dll
+Sliver
+
+# --- PowerShell Abuse & In-Memory Execution ---
+IEX
+Invoke-Expression
+DownloadString
+EncodedCommand
+FromBase64String
+-ExecutionPolicy Bypass
+-ep bypass
+-w hidden
+-noprofile
+-noni
+-DownloadFile
+-ep
+-ep bypass
+-ExecutionPolicy Bypass
+-noni
+-nop
+-Pass
+-Password
+-p
+-P
+-quiet
+-u
+-U
+-url
+-urlcache
+-user
+-username
+-v
+-w hidden
+System.Net.WebClient
+System.Net.Sockets.TCPClient
+WinHttp.WinHttpRequest.5.1
+[System.Reflection.Assembly]
+
+# --- Credential Theft & Lateral Movement Tools (Mimikatz, etc.) ---
+Invoke-Mimikatz
+Invoke-TokenManipulation
+Invoke-Kerberoast
+sekurlsa::
+kerberos::
+logonpasswords
+pth
+golden
+psexec
+SharpHound
+SharpGPOAbuse
+trustedtoauth
+
+# --- Defense Evasion Techniques ---
+amsiInitFailed
+amsi
+Set-MpPreference -Disable
+-DisableRealtimeMonitoring
+AlternateDataStream
+:evil
+:hidden
+:payload
+
+# --- C2 Communication & Suspicious Downloads ---
+pastebin.com/raw
+raw.githubusercontent.com
+webhook.site
+/download
+-DownloadFile
+-urlcache
+
+# --- LOLbins & Suspicious Utilities ---
+bitsadmin
+certutil
+regsvr32
+rundll32
+vssadmin
+wmic
+xp_cmdshell
+
+# --- Suspicious Scripting and File Extensions (use with caution) ---
+.b64
+.bat
+.cab
+.cs
+.csx
+.dll
+.exe
+.hta
+.inf
+.ini
+.js
+.log
+.msc
+.msi
+.ps1
+.reg
+.sct
+.vb
+.vbs
+.wsc
+.wsf
+.xbap
+.xml
+.xsl
+
+# --- General Keywords ---
+bypass
+inject
+dump
+kerberoast
+minidump

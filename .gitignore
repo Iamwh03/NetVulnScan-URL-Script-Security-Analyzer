@@ -1,0 +1,11 @@
+# Ignore model files
+*.pth
+*.onnx
+*.h5
+*.pt
+*.bin
+*.zip
+
+# Optional: ignore other cache/build files
+__pycache__/
+*.log

@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MalwareCommandGuard Analyzer</title>
+    <style>
+        /* --- General Body & Theme --- */
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            min-width: 600px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 1.8em;
+            font-weight: bold;
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        /* --- Tab Navigation --- */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #ddd;
+        }
+        .tab-button {
+            background-color: #e4e6eb;
+            color: #606770;
+            border: none;
+            border-radius: 6px 6px 0 0;
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .tab-button.active {
+            background-color: #007ACC;
+            color: #ffffff;
+        }
+        .tab-button:hover:not(.active) {
+            background-color: #d8dbdf;
+        }
+
+        /* --- Content Panes --- */
+        .tab-pane {
+            display: none; /* Hide panes by default */
+        }
+        .tab-pane.active {
+            display: block; /* Show active pane */
+        }
+
+        /* --- Shared Input Styles --- */
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .text-input {
+            flex-grow: 1;
+            background-color: #f0f2f5;
+            color: #1c1e21;
+            border: 1px solid #ccd0d5;
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 1em;
+        }
+        .analyze-button {
+            background-color: #007ACC;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .analyze-button:hover {
+            background-color: #005A9E;
+        }
+
+        /* --- Report & Results Styling --- */
+        .report-section {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 20px;
+        }
+        h2 {
+            font-size: 1.2em; margin-top: 0; border-bottom: 1px solid #ddd;
+            padding-bottom: 10px; margin-bottom: 15px;
+        }
+        h3 {
+            font-size: 1.1em; font-weight: bold; margin-top: 20px; margin-bottom: 10px;
+        }
+
+        /* --- Command Pane Specific Styles --- */
+        #verdictArea { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        #verdictLabel { font-size: 2em; font-weight: bold; padding: 5px 15px; border-radius: 5px; color: white; }
+        #scoresArea { font-size: 0.9em; line-height: 1.5; }
+        .verdict-BENIGN { background-color: #4CAF50; }
+        .verdict-SUSPICIOUS { background-color: #FFB84C; }
+        .verdict-MALICIOUS { background-color: #FF4C4C; }
+        .verdict-IDLE { background-color: #6c757d; }
+        #analyzedCommand { font-family: monospace; background-color: #f0f2f5; padding: 5px; border-radius: 3px; word-break: break-all; }
+        #analystSummary { font-style: italic; color: #555; white-space: pre-wrap; }
+        #detailedFindings ul { padding-left: 20px; margin: 0; }
+        #detailedFindings li { margin-bottom: 5px; }
+        .metric-triggered { color: #d9534f; font-weight: bold; }
+        .whitelist-match { color: #5cb85c; font-weight: bold; }
+        .evidence { margin-left: 20px; font-family: monospace; }
+
+        /* --- URL Pane Specific Styles --- */
+        #vtResultsURL ul { list-style-type: none; padding-left: 0; }
+        #vtResultsURL li { display: flex; align-items: center; gap: 10px; padding: 5px 0; }
+        .vt-indicator { font-family: monospace; }
+        .vt-clean { color: #4CAF50; }
+        .vt-malicious { color: #FF4C4C; font-weight: bold; }
+        .vt-error { color: #FFB84C; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>MalwareCommandGuard Analyzer</h1>
+
+        <div class="tab-nav">
+            <button class="tab-button active" id="tabCommand">Command</button>
+            <button class="tab-button" id="tabURL">URL</button>
+        </div>
+
+        <div class="tab-pane active" id="paneCommand">
+            <div class="input-area">
+                <input type="text" class="text-input" id="commandInput" placeholder="Enter command to analyze...">
+                <button class="analyze-button" id="analyzeCommandButton">Analyze Command</button>
+            </div>
+            <div class="results-container">
+                <div class="report-section">
+                    <h2>Local Analysis Report</h2>
+                    <div id="verdictArea">
+                        <span id="verdictLabel" class="verdict-IDLE">IDLE</span>
+                        <div id="scoresArea">
+                            <div>Rule-Based Risk Score: <span id="ruleScore">N/A</span></div>
+                            <div>ML Model Confidence: <span id="mlScore">N/A</span></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Command Analyzed:</h3>
+                        <p id="analyzedCommand">N/A</p>
+                    </div>
+                    <div>
+                        <h3>Analyst Summary:</h3>
+                        <p id="analystSummary">Analysis has not run yet.</p>
+                    </div>
+                    <div>
+                        <h3>Detailed Findings:</h3>
+                        <div id="detailedFindings"><ul><li>No findings yet.</li></ul></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane" id="paneURL">
+            <div class="input-area">
+                <input type="text" class="text-input" id="urlInput" placeholder="Enter URL to check with VirusTotal...">
+                <button class="analyze-button" id="analyzeURLButton">Analyze URL</button>
+            </div>
+            <div class="results-container">
+                 <div class="report-section">
+                    <h2>VirusTotal URL Intelligence</h2>
+                    <div id="vtResultsURL"><ul><li>No URLs submitted yet.</li></ul></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const VIRUSTOTAL_API_KEY = "YOUR_API_KEY_HERE"; // IMPORTANT: Replace with your key
+        const SCORE_WEIGHTS = {
+            'lolbin': 25, 'content': 40, 'behavioural': 20,
+            'network': 15, 'source': 10, 'frequency': 5, 'history': 5
+        };
+        const RULE_FILES = ['lolbin.txt', 'content.txt', 'behavioural.txt', 'network.txt', 'source.txt', 'frequency.txt', 'history.txt'];
+        const WHITELIST_FILE = 'whitelist.txt';
+
+        // --- UI ELEMENT REFERENCES ---
+        const tabCommand = document.getElementById('tabCommand');
+        const tabURL = document.getElementById('tabURL');
+        const paneCommand = document.getElementById('paneCommand');
+        const paneURL = document.getElementById('paneURL');
+
+        // Command Pane Elements
+        const analyzeCommandButton = document.getElementById('analyzeCommandButton');
+        const commandInput = document.getElementById('commandInput');
+        const verdictLabel = document.getElementById('verdictLabel');
+        const ruleScoreEl = document.getElementById('ruleScore');
+        const mlScoreEl = document.getElementById('mlScore');
+        const analyzedCommandEl = document.getElementById('analyzedCommand');
+        const analystSummaryEl = document.getElementById('analystSummary');
+        const detailedFindingsEl = document.getElementById('detailedFindings');
+
+        // URL Pane Elements
+        const analyzeURLButton = document.getElementById('analyzeURLButton');
+        const urlInput = document.getElementById('urlInput');
+        const vtResultsURLEl = document.getElementById('vtResultsURL');
+
+        // --- TAB SWITCHING LOGIC ---
+        tabCommand.addEventListener('click', () => {
+            tabCommand.classList.add('active');
+            tabURL.classList.remove('active');
+            paneCommand.classList.add('active');
+            paneURL.classList.remove('active');
+        });
+        tabURL.addEventListener('click', () => {
+            tabURL.classList.add('active');
+            tabCommand.classList.remove('active');
+            paneURL.classList.add('active');
+            paneCommand.classList.remove('active');
+        });
+
+        // --- BACKEND LOGIC ---
+        async function fetchRules(file) {
+            try {
+                const response = await fetch(`./rules/${file}`);
+                if (!response.ok) return [];
+                const text = await response.text();
+                return text.split('\n').map(line => line.trim()).filter(line => line && !line.startsWith('#'));
+            } catch (e) { console.error(`Could not load ${file}:`, e); return []; }
+        }
+
+        async function queryVirusTotal(url) {
+            if (!VIRUSTOTAL_API_KEY || VIRUSTOTAL_API_KEY === "YOUR_API_KEY_HERE") {
+                return { indicator: url, error: "API Key not configured." };
+            }
+            const urlId = btoa(url).replace(/=/g, '');
+            const endpoint = `https://www.virustotal.com/api/v3/urls/${urlId}`;
+            const options = { method: 'GET', headers: { 'x-apikey': VIRUSTOTAL_API_KEY } };
+            try {
+                const response = await fetch(endpoint, options);
+                if (response.status === 404) return { indicator: url, error: "Not found in VirusTotal." };
+                if (!response.ok) return { indicator: url, error: `HTTP Error: ${response.status}` };
+                const data = await response.json();
+                const stats = data.data.attributes.last_analysis_stats;
+                const malicious = stats.malicious || 0;
+                const suspicious = stats.suspicious || 0;
+                const total = Object.values(stats).reduce((a, b) => a + b, 0);
+                return { indicator: url, malicious, suspicious, total };
+            } catch (e) { return { indicator: url, error: "Network request failed." }; }
+        }
+
+        // --- COMMAND ANALYSIS LOGIC ---
+        analyzeCommandButton.addEventListener('click', async () => {
+            const command = commandInput.value.trim();
+            if (!command) return;
+
+            // 1. Fetch all rules
+            const ruleData = {};
+            for(const file of RULE_FILES) {
+                const category = file.replace('.txt', '');
+                const lines = await fetchRules(file);
+                ruleData[category] = lines.map(line => {
+                    const parts = line.split('|');
+                    return { pattern: parts[0].trim().toLowerCase(), reason: (parts[1] || 'No specific reason provided.').trim() };
+                });
+            }
+            const whitelist = (await fetchRules(WHITELIST_FILE)).map(p => p.toLowerCase());
+
+            // 2. Perform Local Analysis
+            const findings = {};
+            const sanitizedCommand = command.toLowerCase();
+            const commandTokens = sanitizedCommand.split(/\s+/);
+
+            if (whitelist.some(p => sanitizedCommand.includes(p))) {
+                findings.whitelisted = [{ reason: "Command contains a trusted pattern." }];
+            }
+
+            for (const category in ruleData) {
+                for (const rule of ruleData[category]) {
+                    if (commandTokens.some(token => token.includes(rule.pattern))) {
+                        if (!findings[category]) findings[category] = [];
+                        if (!findings[category].some(f => f.reason === rule.reason)) { // Avoid duplicate reasons
+                             findings[category].push({ pattern: rule.pattern, reason: rule.reason });
+                        }
+                    }
+                }
+            }
+
+            // Mock ML Model
+            let mlConfidence = 0;
+            if (command.includes("powershell") && command.includes("DownloadString")) {
+                findings.machine_learning = [{ reason: "Flagged by ML", confidence: 85.5 }];
+                mlConfidence = 85.5;
+            }
+
+            // 3. Calculate Score & Verdict
+            const isWhitelisted = 'whitelisted' in findings;
+            let ruleScore = 0;
+            for(const category in findings) {
+                if (category !== 'whitelisted' && category !== 'machine_learning') {
+                    ruleScore += (SCORE_WEIGHTS[category] || 0) * findings[category].length;
+                }
+            }
+
+            let verdict = "BENIGN";
+            if (mlConfidence > 50 || ruleScore > 60) verdict = "MALICIOUS";
+            else if (ruleScore > 20) verdict = "SUSPICIOUS";
+            if (isWhitelisted && verdict !== 'MALICIOUS') verdict = "BENIGN";
+
+            // 4. Display Full Report
+            displayCommandReport(command, findings, verdict, ruleScore, mlConfidence);
+        });
+
+        function displayCommandReport(command, findings, verdict, ruleScore, mlConfidence) {
+            verdictLabel.textContent = verdict;
+            verdictLabel.className = `verdict-${verdict}`;
+            ruleScoreEl.textContent = `${ruleScore.toFixed(1)}%`;
+            mlScoreEl.textContent = mlConfidence > 0 ? `${mlConfidence.toFixed(2)}%` : 'N/A';
+            analyzedCommandEl.textContent = command;
+
+            // Analyst Summary
+            const summaryPoints = Object.values(findings).flat().map(f => f.reason);
+            const uniquePoints = [...new Set(summaryPoints)];
+            if (uniquePoints.length > 0) {
+                 analystSummaryEl.textContent = `This command is rated ${verdict} based on ${uniquePoints.length} unique observation(s):\n• ${uniquePoints.join('\n• ')}`;
+            } else {
+                 analystSummaryEl.textContent = "The command appears benign based on local rules.";
+            }
+
+            // Detailed Findings
+            detailedFindingsEl.innerHTML = '';
+            const ul = document.createElement('ul');
+            if (Object.keys(findings).length === 0) {
+                ul.innerHTML = '<li>No suspicious indicators detected.</li>';
+            } else {
+                for (const category in findings) {
+                    const li = document.createElement('li');
+                    const isWhitelist = category === 'whitelisted';
+                    li.innerHTML = `
+                        <span class="${isWhitelist ? 'whitelist-match' : 'metric-triggered'}">METRIC: ${category.toUpperCase()} ${isWhitelist ? '(MITIGATED)' : ''}</span>
+                        <div class="evidence">
+                            ${findings[category].map(f => `&ndash; Rule: ${f.pattern || 'N/A'} (Reason: ${f.reason})`).join('<br>')}
+                        </div>`;
+                    ul.appendChild(li);
+                }
+            }
+            detailedFindingsEl.appendChild(ul);
+        }
+
+        // --- URL ANALYSIS LOGIC ---
+        analyzeURLButton.addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            if (!url) return;
+            vtResultsURLEl.innerHTML = '<ul><li>Checking URL with VirusTotal...</li></ul>';
+            const urlData = await queryVirusTotal(url);
+
+            // Display URL VT results
+            vtResultsURLEl.innerHTML = '';
+            const ul = document.createElement('ul');
+            const li = document.createElement('li');
+            let resultHTML = `<span class="vt-indicator">${urlData.indicator}:</span>`;
+            if (urlData.error) {
+                resultHTML += `<span class="vt-error">${urlData.error}</span>`;
+            } else if (urlData.malicious > 0 || urlData.suspicious > 0) {
+                resultHTML += `<span class="vt-malicious">Flagged by ${urlData.malicious + urlData.suspicious} / ${urlData.total} engines.</span>`;
+            } else {
+                resultHTML += `<span class="vt-clean">Clean (0 / ${urlData.total} engines)</span>`;
+            }
+            li.innerHTML = resultHTML;
+            ul.appendChild(li);
+            vtResultsURLEl.appendChild(ul);
+        });
+    </script>
+</body>
+</html>

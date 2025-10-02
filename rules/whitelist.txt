@@ -1,0 +1,52 @@
+# Format: User/Process:Reason
+notepad.exe:Legitimate text editor
+explorer.exe:Windows file manager
+svchost.exe:System process
+user1@domain.com:Approved admin
+# MalCommandGuard Whitelist
+#
+# Add keywords or command fragments here that are known to be safe.
+# This helps prevent false positives from legitimate administrative or development tasks.
+# The engine will perform a partial match, so 'git clone' will match 'git clone https://...'
+
+# --- Development Tools ---
+git clone
+git status
+git pull
+git push
+npm install
+npm start
+docker run
+docker ps
+docker-compose up
+vagrant up
+
+# --- System Administration & Diagnostics ---
+ipconfig /all
+netstat -an
+get-process
+get-service
+systeminfo
+sfc /scannow
+chkdsk
+gpupdate /force
+whoami
+hostname
+
+# --- Common Benign PowerShell Usage ---
+get-help
+get-command
+get-module
+install-module
+set-executionpolicy remotesigned
+get-itemproperty
+test-netconnection
+get-aduser
+get-adcomputer
+
+# --- Common Benign URLs ---
+github.com
+microsoft.com
+stackoverflow.com
+google.com
+calc.exe

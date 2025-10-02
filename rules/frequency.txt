@@ -1,0 +1,121 @@
+# ======================================================================
+# Frequency & Persistence Ruleset for MalCommandGuard
+#
+# This file contains keywords and commands related to:
+# 1. Task Scheduling & Persistence - To survive reboots.
+# 2. Execution Delay & Evasion - To wait out security tools.
+# 3. Looping & Scripting - For repetitive actions like beaconing.
+# ======================================================================
+
+# --- 1. Task Scheduling & Persistence (High-Value Indicators) ---
+# Tools for creating scheduled tasks in Windows and Linux
+schtasks
+at.exe
+cron
+crontab -e
+
+# WMI-based persistence (very common for stealthy malware)
+wmic process call create
+wmic /node:localhost process call create
+Register-WmiEvent
+Set-WmiInstance
+
+# Registry-based persistence (classic autorun locations)
+reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run
+reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run
+reg add HKCU\Software\Microsoft\Windows\CurrentVersion\RunOnce
+reg add HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce
+
+# PowerShell profile persistence (runs code every time PowerShell starts)
+profile.ps1
+$profile
+
+# Service creation for persistence
+sc.exe create
+New-Service
+
+
+# --- 2. Execution Delay & Evasion ---
+# Common commands to pause a script
+timeout /t
+ping -n
+start-sleep
+waitfor
+sleep
+
+# A less common delay tactic using certutil
+certutil -ping
+
+
+# --- 3. Scripting & Looping Constructs ---
+# Batch file looping
+for /l
+for /f
+goto :
+call :
+
+# PowerShell looping
+foreach
+ForEach-Object
+while(
+do {
+
+# VBScript/JScript looping
+Do While
+Loop
+
+
+# --- 4. Chained or Repetitive Execution ---
+# Spawning new shells to run commands, often in a loop or chain
+cmd /c
+cmd /k
+powershell -command
+powershell -encodedcommand
+powershell -exec bypass
+pwsh -c
+RunOnce
+
+-every
+-mo
+-sc
+-st
+-tn
+-tr
+/create
+/delete
+/every
+/interactive
+/mo
+/run
+/sc
+/st
+/tn
+/tr
+at.exe
+cron
+crontab
+for
+for /f
+for /l
+foreach
+goto
+loop
+ping -n
+reg add HKCU\Software\Microsoft\Windows\CurrentVersion\Run
+reg add HKCU\Software\Microsoft\Windows\CurrentVersion\RunOnce
+reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run
+reg add HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce
+repeat
+RunOnce
+schtasks
+sleep
+start-sleep
+timeout
+until
+waitfor
+while
+HKCU\Software\Classes\*\shell\open\command
+Set-Service
+while ($true)
+Start-Job
+Register-ScheduledTask
