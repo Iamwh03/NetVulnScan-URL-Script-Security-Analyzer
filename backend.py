@@ -21,8 +21,8 @@ warnings.filterwarnings("ignore", category=UserWarning, module='sklearn')
 
 # --- CONFIGURATION & SECURITY BEST PRACTICE ---
 # Replace these placeholders with your new, secret API keys.
-VIRUSTOTAL_API_KEY = "3d925e1ec3e8c639c107e46a718fe07835c7297a5d3f39b63418da3acba6a8e5"
-URLSCAN_API_KEY = "0197a6f0-e575-7134-9f7f-64ac8ae6b892"
+VIRUSTOTAL_API_KEY = "xxxxxxxxxxxxxxxxxxxxxx"
+URLSCAN_API_KEY = "xxxxxxxxxxxxxxxxxxxxx"
 
 
 import os, requests
